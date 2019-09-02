@@ -66,44 +66,27 @@ func main() {
 	text := msg.Text
 	text = strings.TrimPrefix(text, prefix)
 	text = strings.TrimSpace(text)
-	text = strings.ToLower(text)
+	text = strings.ToUpper(text)
 
-	acceptedMessage := map[string]bool{
-		"hello":      true,
-		"hey!":       true,
-		"hi":         true,
-    "exchange":   true,
-	}
-	acceptedHowAreYou := map[string]bool{
-		"how's it going?": true,
-		"how are ya?":     true,
-		"feeling okay?":   true,
-	}
-
-	if acceptedMessage[text] {
-		response = "Hello Super Star :star:"
-		rtm.SendMessage(rtm.NewOutgoingMessage(response, msg.Channel))
-	} else if acceptedHowAreYou[text] {
-		response = "Good. How are you?"
-		rtm.SendMessage(rtm.NewOutgoingMessage(response, msg.Channel))
-	}
+//TODO : Validate the input before call getExchange
+  response =  getExchange(text)
+  rtm.SendMessage(rtm.NewOutgoingMessage(response, msg.Channel))
 }
 
 //Call get exchange rate API
-func getExchange(currency string) {
+func getExchange(currency string) string {
 
   response, err := http.Get("http://www.apilayer.net/api/live?access_key=b2e3d360a5c775a403d9ddff35e33cbd&format=1")
-
   if err != nil {
       fmt.Print(err.Error())
       os.Exit(1)
   }
-
   responseData, err := ioutil.ReadAll(response.Body)
-  value := gjson.GetBytes(responseData, "quotes.USDCAD")
+  value := gjson.GetBytes(responseData, "quotes."+currency+"")
   println(value.String())
 
   if err != nil {
       log.Fatal(err)
   }
+    return (":dollar: The exchange rate from " + currency + " = " +value.String())
 }
