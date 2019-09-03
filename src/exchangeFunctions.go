@@ -8,11 +8,11 @@ import (
 	"os"
 )
 
-func getExchange(currency string) string {
+func getExchange(currency string, exToken string) string {
 	var positive string
 	var negative string
 
-	response, err := http.Get("http://www.apilayer.net/api/live?access_key=b2e3d360a5c775a403d9ddff35e33cbd&format=1")
+	response, err := http.Get("http://www.apilayer.net/api/live?access_key="+exToken+"&format=1")
 	if err != nil {
 		fmt.Print(err.Error())
 		os.Exit(1)
@@ -21,7 +21,7 @@ func getExchange(currency string) string {
 	value := gjson.GetBytes(responseData, "quotes."+currency+"")
 
 	positive = ":dollar: The exchange rate from " + currency + " = " + value.String()
-	negative = "Please check your currency format:exclamation:"
+	negative = "Please check your currency format Ex: USDCAD :exclamation:"
 
 	if gjson.GetBytes(responseData, "quotes."+currency+"").Exists() {
 		return (positive)
