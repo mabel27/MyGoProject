@@ -5,7 +5,7 @@ import (
   "os"
   "strings"
   "io/ioutil"
-  "log"
+  //"log"
   "net/http"
 
   "github.com/nlopes/slack"
@@ -60,7 +60,6 @@ func main() {
     }
   }
 
-//Example botRespond
   func botRespond(rtm *slack.RTM, msg *slack.MessageEvent, prefix string) {
 	var response string
 	text := msg.Text
@@ -68,13 +67,14 @@ func main() {
 	text = strings.TrimSpace(text)
 	text = strings.ToUpper(text)
 
-//TODO : Validate the input before call getExchange
   response =  getExchange(text)
   rtm.SendMessage(rtm.NewOutgoingMessage(response, msg.Channel))
 }
 
 //Call get exchange rate API
 func getExchange(currency string) string {
+  var positive string
+  var negative string
 
   response, err := http.Get("http://www.apilayer.net/api/live?access_key=b2e3d360a5c775a403d9ddff35e33cbd&format=1")
   if err != nil {
@@ -83,10 +83,14 @@ func getExchange(currency string) string {
   }
   responseData, err := ioutil.ReadAll(response.Body)
   value := gjson.GetBytes(responseData, "quotes."+currency+"")
-  println(value.String())
 
-  if err != nil {
-      log.Fatal(err)
+  positive = ":dollar: The exchange rate from " + currency + " = " +value.String()
+  negative = "Please check your currency format:exclamation:"
+
+  if gjson.GetBytes(responseData,  "quotes."+currency+"").Exists() {
+  	return (positive)
+  }else
+  {
+    return(negative)
   }
-    return (":dollar: The exchange rate from " + currency + " = " +value.String())
 }
