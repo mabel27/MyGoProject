@@ -17,7 +17,7 @@ func getenv(name string) string {
 
 func main() {
 	token := getenv("SLACKTOKEN")
-  exToken := getenv("EXCHANGETOKEN")
+	exToken := getenv("EXCHANGETOKEN")
 	api := slack.New(token)
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
@@ -38,7 +38,7 @@ Loop:
 				prefix := fmt.Sprintf("<@%s> ", info.User.ID)
 
 				if ev.User != info.User.ID && strings.HasPrefix(ev.Text, prefix) {
-					botRespond(rtm, ev, prefix,exToken)
+					botRespond(rtm, ev, prefix, exToken)
 				}
 
 			case *slack.RTMError:
@@ -62,6 +62,6 @@ func botRespond(rtm *slack.RTM, msg *slack.MessageEvent, prefix string, exToken 
 	text = strings.TrimSpace(text)
 	text = strings.ToUpper(text)
 
-	response = getExchange(text,exToken)
+	response = getExchange(text, exToken)
 	rtm.SendMessage(rtm.NewOutgoingMessage(response, msg.Channel))
 }
